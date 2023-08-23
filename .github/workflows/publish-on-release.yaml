@@ -1,0 +1,30 @@
+name: Publish Version
+
+on:
+  push:
+    tags:
+      - v*.*.*
+  workflow_dispatch:
+
+env:
+  CICD_GITHUB_TOKEN: ${{ secrets.CICD_GITHUB_TOKEN }}
+
+jobs:
+  publish-on-release:
+    name: Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: npm install
+        run: npm ci --ignore-scripts
+
+      - name: Publish as a GitHub package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish
+
